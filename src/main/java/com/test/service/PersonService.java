@@ -8,4 +8,9 @@ public interface PersonService {
     PersonResponse addPersonInfo(PersonRequest personRequestDto);
 
     PersonResponse getPersonInfo(Long id);
+
+    void delete(Long id);
+
+    void updatePerson(Long id, PersonRequest personRequestDto);
+
 }

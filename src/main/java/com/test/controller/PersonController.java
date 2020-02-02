@@ -24,8 +24,18 @@ public class PersonController {
     @ResponseBody
     public PersonResponse addPeopleInfo(@PathVariable Long id) {
         return personService.getPersonInfo(id);
-
     }
+
+    @DeleteMapping(path = "/{id}")
+    public void deletePeopleInfo(@PathVariable Long id) {
+        personService.delete(id);
+    }
+
+    @PatchMapping(path = "/{id}")
+    public void updatePeopleInfo(@PathVariable Long id, @RequestBody PersonRequest personRequest) {
+        personService.updatePerson(id, personRequest);
+    }
+
 
 }
 

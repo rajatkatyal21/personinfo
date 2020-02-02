@@ -4,6 +4,7 @@ import com.test.dto.PersonRequest;
 import com.test.dto.PersonResponse;
 import com.test.entity.Person;
 import com.test.entity.PersonHobby;
+import com.test.entity.PersonHobbyId;
 import com.test.exception.NotFoundException;
 import com.test.repository.PersonHobbyRepository;
 import com.test.repository.PersonRepository;
@@ -19,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -176,4 +178,60 @@ class PersonServiceImplTest {
         Assertions.assertEquals(expected, actual);
 
     }
+
+
+    @Test
+    @DisplayName("delete by Id")
+    void delete() {
+
+        Set<PersonHobby> set = new HashSet<>();
+        PersonHobby personHobby = new PersonHobby();
+        personHobby.setHobby("cricket");
+        personHobby.setPersonId(1L);
+        set.add(personHobby);
+        Mockito.when(personHobbyRepository.findPersonHobbiesByPersonId(1L)).thenReturn(set);
+        personService.delete(1L);
+
+        Mockito.verify(personHobbyRepository).deleteById(new PersonHobbyId(1l, "cricket"));
+        Mockito.verify(personRepository).deleteById(1L);
+
+    }
+
+    @Test
+    @DisplayName("Update the Person")
+    void update_hobbies() {
+
+        PersonRequest personRequest = PersonRequest.builder()
+                .hobbies(new HashSet<>(Arrays.asList("rugby")))
+                .build();
+
+        Person person = Person.builder()
+                .age(10)
+                .favouriteColor("white")
+                .lastName("katyal")
+                .firstName("Rajat")
+                .build();
+
+        PersonHobby hobby1 = new PersonHobby();
+        hobby1.setPersonId(1L);
+        hobby1.setHobby("cricket");
+
+        PersonHobby hobby2 = new PersonHobby();
+        hobby2.setPersonId(1L);
+        hobby2.setHobby("football");
+
+        Set<PersonHobby> set = new HashSet<>(Arrays.asList(hobby1, hobby2));
+
+
+        Mockito.when(personRepository.findById(1L)).thenReturn(Optional.of(person));
+        Mockito.when(personHobbyRepository.findPersonHobbiesByPersonId(1L)).thenReturn(set);
+
+        personService.updatePerson(1L, personRequest);
+
+        Mockito.verify(personHobbyRepository, Mockito.times(1)).deleteById(new PersonHobbyId(1L, "cricket"));
+        Mockito.verify(personHobbyRepository, Mockito.times(1)).deleteById(new PersonHobbyId(1L, "football"));
+        Mockito.verify(personRepository, Mockito.times(0)).save(new Person());
+    }
+
+
 }
