@@ -21,7 +21,6 @@ class PersonControllerTest {
 
         given()
                 .body(payload)
-                .post("/person").then().statusCode(200).assertThat()
-                .body("id", equalTo("1"));
+                .post("/person").then().statusCode(200);
     }
 }

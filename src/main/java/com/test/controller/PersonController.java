@@ -16,8 +16,16 @@ public class PersonController {
     @PostMapping
     @ResponseBody
     public PersonResponse addPeopleInfo(@RequestBody PersonRequest request) {
-        return null;
+        return personService.addPersonInfo(request);
+
+    }
+
+    @GetMapping(path = "/{id}")
+    @ResponseBody
+    public PersonResponse addPeopleInfo(@PathVariable Long id) {
+        return personService.getPersonInfo(id);
 
     }
 
 }
+

@@ -1,9 +1,13 @@
 package com.test.service;
 
 import com.test.dto.PersonRequest;
+import com.test.dto.PersonResponse;
 import com.test.entity.Person;
 import com.test.entity.PersonHobby;
+import com.test.exception.NotFoundException;
+import com.test.repository.PersonHobbyRepository;
 import com.test.repository.PersonRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +27,9 @@ class PersonServiceImplTest {
 
     @Mock
     PersonRepository personRepository;
+
+    @Mock
+    PersonHobbyRepository personHobbyRepository;
 
     @InjectMocks
     PersonServiceImpl personService;
@@ -33,18 +41,47 @@ class PersonServiceImplTest {
 
     @Test
     @DisplayName("Add person test")
-    void addPersonInfo() {
-        PersonHobby hobby1 = PersonHobby.builder().hobby("cricket").build();
-        PersonHobby hobby2 = PersonHobby.builder().hobby("football").build();
-        HashSet<PersonHobby> hobbies = new HashSet<>(Arrays.asList(hobby1, hobby2));
-
+    void addPersonInfo_with_no_hobbies() {
         Person person = Person.builder()
                 .age(20)
                 .firstName("Rajat")
                 .lastName("katyal")
                 .favouriteColor("black")
-                .hobbies(hobbies)
                 .build();
+
+        Mockito.when(personRepository.save(person)).thenReturn(Person.builder().id(1L).build());
+
+        PersonRequest request = PersonRequest.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .build();
+
+        PersonResponse response = personService.addPersonInfo(request);
+
+        Assertions.assertEquals(1, response.getId());
+
+    }
+
+    @Test
+    @DisplayName("Add person test")
+    void addPersonInfo() {
+        Person person = Person.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .build();
+
+        PersonHobby hobby1 = new PersonHobby();
+        hobby1.setPersonId(1L);
+        hobby1.setHobby("cricket");
+
+        PersonHobby hobby2 = new PersonHobby();
+        hobby2.setPersonId(1L);
+        hobby2.setHobby("football");
+
 
         Mockito.when(personRepository.save(person)).thenReturn(Person.builder().id(1L).build());
 
@@ -56,9 +93,87 @@ class PersonServiceImplTest {
                 .hobbies(new HashSet<>(Arrays.asList("cricket", "football")))
                 .build();
 
-        Person response = personService.addPersonInfo(request);
+        PersonResponse response = personService.addPersonInfo(request);
 
-        assertEquals(person.getId(), response.getId());
+        Mockito.verify(personHobbyRepository).save(hobby1);
+        Mockito.verify(personHobbyRepository).save(hobby2);
+
+        Assertions.assertEquals(1, response.getId());
+
+    }
+
+    @Test
+    @DisplayName("get Person method when the entity is not found")
+    void GetPersonInfo_Not_found() {
+        Mockito.when(personRepository.findById(1L)).thenReturn(Optional.empty());
+        Mockito.when(personHobbyRepository.findPersonHobbiesByPersonId(1L)).thenReturn(new HashSet<>());
+
+        Assertions.assertThrows(NotFoundException.class, () ->
+                personService.getPersonInfo(1L)
+        );
+    }
+
+    @Test
+    @DisplayName("get Person info")
+    void GetPersonInfo() {
+        Person person = Person.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .build();
+
+        PersonHobby hobby1 = new PersonHobby();
+        hobby1.setPersonId(1L);
+        hobby1.setHobby("cricket");
+
+        PersonHobby hobby2 = new PersonHobby();
+        hobby2.setPersonId(1L);
+        hobby2.setHobby("football");
+
+        HashSet<PersonHobby> set = new HashSet<>(Arrays.asList(hobby1, hobby2));
+
+        Mockito.when(personRepository.findById(1L)).thenReturn(Optional.of(person));
+        Mockito.when(personHobbyRepository.findPersonHobbiesByPersonId(1L)).thenReturn(set);
+
+        PersonResponse expected = PersonResponse.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .hobbies(new HashSet<>(Arrays.asList("cricket", "football")))
+                .build();
+
+        PersonResponse actual = personService.getPersonInfo(1L);
+
+        Assertions.assertEquals(expected, actual);
+
+    }
+
+    @Test
+    @DisplayName("get Person info with no hobbies")
+    void GetPersonInfo_with_No_Hobbies() {
+        Person person = Person.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .build();
+
+        Mockito.when(personRepository.findById(1L)).thenReturn(Optional.of(person));
+        Mockito.when(personHobbyRepository.findPersonHobbiesByPersonId(1L)).thenReturn(new HashSet<>());
+
+        PersonResponse expected = PersonResponse.builder()
+                .age(20)
+                .firstName("Rajat")
+                .lastName("katyal")
+                .favouriteColor("black")
+                .hobbies(new HashSet<>())
+                .build();
+
+        PersonResponse actual = personService.getPersonInfo(1L);
+
+        Assertions.assertEquals(expected, actual);
 
     }
 }

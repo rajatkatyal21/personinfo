@@ -1,24 +1,19 @@
 package com.test.entity;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "people_hobby")
+@Entity(name = "hobby")
+@Table(name = "person_hobby")
+@NoArgsConstructor
 @Data
-@Builder
+@IdClass(PersonHobbyId.class)
 public class PersonHobby {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Long personId;
+    @Id
     private String hobby;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Person people;
-
 }
