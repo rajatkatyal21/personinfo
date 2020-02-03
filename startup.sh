@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export username=admin
-export password=admin
+export password=password
 mvn clean package spring-boot:run
 
 #if tests needs to be skipped
