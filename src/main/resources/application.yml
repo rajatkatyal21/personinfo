@@ -10,7 +10,7 @@ spring:
     console:
       enabled: true
 server:
-  port: 8000
+  port: ${port:8080}
 
 app:
   username: ${username}
