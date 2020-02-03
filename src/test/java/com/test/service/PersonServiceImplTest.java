@@ -115,7 +115,7 @@ class PersonServiceImplTest {
 
     @Test
     @DisplayName("get Person info")
-    void GetPersonInfo() {
+    void GetPersonInfo() throws NotFoundException {
         Person person = Person.builder()
                 .age(20)
                 .firstName("Rajat")
@@ -152,7 +152,7 @@ class PersonServiceImplTest {
 
     @Test
     @DisplayName("get Person info with no hobbies")
-    void GetPersonInfo_with_No_Hobbies() {
+    void GetPersonInfo_with_No_Hobbies() throws NotFoundException {
         Person person = Person.builder()
                 .age(20)
                 .firstName("Rajat")
@@ -197,7 +197,7 @@ class PersonServiceImplTest {
 
     @Test
     @DisplayName("Update the Person")
-    void update_hobbies() {
+    void update_hobbies() throws NotFoundException {
 
         PersonRequest personRequest = PersonRequest.builder()
                 .hobbies(new HashSet<>(Arrays.asList("rugby")))

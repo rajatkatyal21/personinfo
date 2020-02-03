@@ -50,7 +50,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public PersonResponse getPersonInfo(Long id) {
+    public PersonResponse getPersonInfo(Long id) throws NotFoundException {
         Person person = personRepository.findById(id).orElseThrow(NotFoundException::new);
         Set<String> personHobbies = personHobbyRepository.findPersonHobbiesByPersonId(id).stream().map(PersonHobby::getHobby).collect(Collectors.toSet());
         return PersonResponse.builder()
@@ -75,7 +75,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void updatePerson(Long id, PersonRequest personRequestDto) {
+    public void updatePerson(Long id, PersonRequest personRequestDto) throws NotFoundException {
         Person person = personRepository.findById(id).orElseThrow(NotFoundException::new);
         Set<PersonHobby> personHobbiesByPersonId = personHobbyRepository.findPersonHobbiesByPersonId(id);
 
