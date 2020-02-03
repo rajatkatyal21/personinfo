@@ -11,7 +11,9 @@ import com.test.repository.PersonRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -92,14 +94,15 @@ public class PersonServiceImpl implements PersonService {
 
         personRepository.save(personToSave);
 
-        if (personHobbiesByPersonId != null || personHobbiesByPersonId.size() > 0) {
+        if (personRequestDto.getHobbies() != null && personHobbiesByPersonId != null) {
             personHobbiesByPersonId
                     .forEach(personHobby -> {
                         PersonHobbyId personHobbyId = new PersonHobbyId(personHobby.getPersonId(), personHobby.getHobby());
                         personHobbyRepository.deleteById(personHobbyId);
                     });
 
-            personRequestDto.getHobbies()
+            Optional.ofNullable(personRequestDto.getHobbies())
+                    .orElseGet(HashSet::new)
                     .forEach(s -> {
                         PersonHobby personHobby = new PersonHobby();
                         personHobby.setPersonId(id);

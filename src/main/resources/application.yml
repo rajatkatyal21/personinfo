@@ -11,3 +11,7 @@ spring:
       enabled: true
 server:
   port: 8000
+
+app:
+  username: ${username}
+  password: ${password}

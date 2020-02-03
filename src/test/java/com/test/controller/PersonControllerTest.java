@@ -4,28 +4,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.dto.PersonRequest;
 import com.test.dto.PersonResponse;
 import com.test.service.PersonService;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class PersonControllerTest {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,8 +37,16 @@ class PersonControllerTest {
     @MockBean
     PersonService personService;
 
+    @BeforeEach
+    void setup(){
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
+    @WithMockUser("admin")
     void addPeopleInfo() throws Exception {
         PersonRequest request = PersonRequest.builder()
                 .age(20)
@@ -60,6 +72,7 @@ class PersonControllerTest {
     }
 
     @Test
+    @WithMockUser("admin")
     void GetPeopleInfo() throws Exception {
         PersonResponse response = PersonResponse.builder()
                 .age(20)
@@ -81,6 +94,7 @@ class PersonControllerTest {
     }
 
     @Test
+    @WithMockUser("admin")
     void PersonDelete() throws Exception {
 
         this.mockMvc.perform(MockMvcRequestBuilders.delete("/person/1")
@@ -90,6 +104,7 @@ class PersonControllerTest {
     }
 
     @Test
+    @WithMockUser("admin")
     void updatePerson() throws Exception {
         PersonRequest request = PersonRequest.builder()
                 .age(20)
