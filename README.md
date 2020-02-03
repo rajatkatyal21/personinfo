@@ -3,6 +3,8 @@
 ####Start application
 ```$xslt
 sh startup.sh
+
+-- The test cases will run and application will run on the port specified in the file. 
 ```
 
 #### set username, password and port in startup.sh
