@@ -1,6 +1,6 @@
 # personinfo app
 
-####Start application
+#### Start application
 ```$xslt
 sh startup.sh
 
@@ -52,7 +52,7 @@ curl --location --request POST 'http://localhost:8000/person' \
 }'
 ```
 
-####Technology Stak
+#### Technology Stak
 ```$xslt
 1. Java 
 2. Spring boot
